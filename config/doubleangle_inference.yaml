@@ -1,0 +1,52 @@
+seed: 42
+
+test_data_path: "data/angle/test"
+
+standard_scaler_path: "outputs/doubleangle/input_cont_scaler.pkl"
+label_encoders_path: "outputs/doubleangle/input_cate_encoders.pkl"
+model_checkpoint_path: "outputs/doubleangle/lightning_logs/version_10/checkpoints/epoch=505-step=108790.ckpt"
+
+output_folder_path: "outputs/doubleangle_inference"
+
+dataset:
+  input_angle_cont_cols: [
+    ["V_1_1", "V_1_2", "V_1_3", "V_1_4", "V_1_5"],
+    ["V_2_1", "V_2_2", "V_2_3", "V_2_4", "V_2_5"],
+  ]
+  input_angle_data_cols: [
+    ["V_1_A_1", "V_1_A_2", "V_1_A_3"],
+    ["V_2_A_1", "V_2_A_2", "V_2_A_3"],
+  ]
+  input_cont_cols: ["X_1", "X_2", "X_3", "X_4", "X_5", "X_6", "X_7"]
+  input_cate_cols: ["C_2", "C_3"]
+  task_target_cols: ["AOD_500nm", "Fine_Mode_AOD_500nm", "Coarse_Mode_AOD_500nm", "FineModeFraction_500nm"]
+
+dataloader:
+  batch_size: 64
+  num_workers: 4
+
+model:
+  d_model: 256
+  n_tf_head: 4
+  n_tf_layer: 2
+  p_tf_drop: 0.1
+  n_mlp_layer: 1
+  p_mlp_drop: 0.1
+  lr: 0.0005
+  double_angle: True
+
+callbacks:
+  model_checkpoint:
+    save_top_k: 5
+    monitor: "val_r2"
+    mode: "max"
+  early_stopping:
+    monitor: "val_r2"
+    mode: "max"
+    patience: 1000
+    min_delta: 0.0
+
+trainer:
+  max_epochs: 5000
+  accelerator: "gpu"
+  devices: 1

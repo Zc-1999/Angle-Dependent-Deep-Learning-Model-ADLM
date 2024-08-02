@@ -1,0 +1,51 @@
+seed: 42
+
+train_data_path: "data/angle/train.csv"
+valid_data_path: "data/angle/valid.csv"
+test_data_path: "data/angle/test"
+
+output_folder_path: "outputs/doubleangle"
+
+dataset:
+  input_angle_cont_cols: [
+    ["V_1_1", "V_1_2", "V_1_3", "V_1_4", "V_1_5"],
+    ["V_2_1", "V_2_2", "V_2_3", "V_2_4", "V_2_5"],
+  ]
+  input_angle_data_cols: [
+    ["V_1_A_1", "V_1_A_2", "V_1_A_3"],
+    ["V_2_A_1", "V_2_A_2", "V_2_A_3"],
+  ]
+  input_cont_cols: ["X_1", "X_2", "X_3", "X_4", "X_5", "X_6", "X_7"]
+  input_cate_cols: ["C_2", "C_3"]
+  task_target_cols: ["AOD_500nm", "Fine_Mode_AOD_500nm", "Coarse_Mode_AOD_500nm", "FineModeFraction_500nm"]
+
+dataloader:
+  batch_size: 256
+  num_workers: 4
+
+model:
+  d_model: 256
+  n_tf_head: 4
+  n_tf_layer: 2
+  p_tf_drop: 0.1
+  n_mlp_layer: 1
+  p_mlp_drop: 0.1
+  lr: 0.0003
+  double_angle: True
+  loss: "rel"
+
+callbacks:
+  model_checkpoint:
+    save_top_k: 5
+    monitor: "val_r2"
+    mode: "max"
+  early_stopping:
+    monitor: "val_r2"
+    mode: "max"
+    patience: 100
+    min_delta: 0.0
+
+trainer:
+  max_epochs: 5000
+  accelerator: "gpu"
+  devices: 1
